@@ -1,4 +1,5 @@
-import PhotosSection from "./components/PhotosSection"
+import Upload  from "./pages/Upload"
+// import PhotosSection from "./components/PhotosSection"
 import Topbar from "./components/Topbar"
 
 function App() {
@@ -6,7 +7,7 @@ function App() {
     <>
       <Topbar />
       <div className="md:mx-48">
-        <PhotosSection date="April 24, 2025"
+        {/* <PhotosSection date="April 24, 2025"
           photos={[
             {
               id: "1",
@@ -24,7 +25,9 @@ function App() {
               caption: "Downtown vibes",
             }
           ]} 
-        />
+        />  */}
+
+        <Upload />
       </div>
     </>
   )
