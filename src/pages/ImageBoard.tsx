@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -11,19 +12,17 @@ import {
   SortableContext,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-
-
-import { useState } from 'react';
 import DraggableImageCard from '../components/DraggableImageCard';
+import ImageViewModal from '../modals/ImageViewModal';
 
-
-
-// Main board
 function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
   const initialIds = imagesMetadata.map((_, i) => i.toString());
   const [items, setItems] = useState(initialIds);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isLocked, setIsLocked] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalImage, setModalImage] = useState('');
+  const [modalTitle, setModalTitle] = useState('');
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -52,30 +51,46 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
     console.log("🧩 New Order:", reordered);
   };
 
+  const openModal = (image: string, title: string) => {
+    setModalImage(image);
+    setModalTitle(title);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
   return (
     <div className="w-full p-4">
       {/* Buttons */}
-      <div className="flex justify-end mb-4 gap-2">
-        <button
-          onClick={handleSaveOrder}
-          className="bg-[#890000] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer"
-        >
-          Save Changes
-        </button>
-        <button
-          onClick={() => setIsLocked(!isLocked)}
-          className={`px-6 py-2 rounded-xl font-semibold transition-colors cursor-pointer ${
-            isLocked
-              ? 'bg-gray-400 text-white hover:bg-gray-500'
-              : 'bg-green-600 text-white hover:bg-green-700'
-          }`}
-        >
-          {isLocked ? 'Unlock' : 'Lock'}
-        </button>
+      <div className="flex justify-between my-12">
+        <div>
+          <h1 className="text-3xl font-semibold mb-4">⛄Kashmir ❄️ Diaries 📖</h1>
+          <div className="text-xs font-semibold text-gray-400">25 photos ▪️ last edited: 3 days ago ▪️ Private </div>
+        </div>
+        <div className="flex justify-end mb-4 gap-2">
+          <button
+            onClick={handleSaveOrder}
+            className="bg-[#890000] text-white px-6 py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer"
+          >
+            Save Changes
+          </button>
+          <button
+            onClick={() => setIsLocked(!isLocked)}
+            className={`px-6 py-2 rounded-xl font-semibold transition-colors cursor-pointer ${
+              isLocked
+                ? 'bg-gray-400 text-white hover:bg-gray-500'
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+          >
+            {isLocked ? 'Unlock' : 'Lock'}
+          </button>
+        </div>
       </div>
 
       {/* DND context */}
-      <DndContext
+      < DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
@@ -93,6 +108,7 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
                   image={imageURL}
                   title={title}
                   isLocked={isLocked}
+                  onEyeClick={() => openModal(imageURL, title)} // Pass the click handler
                 />
               );
             })}
@@ -108,10 +124,19 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
               title={imagesMetadata[parseInt(activeId)].title}
               isDragging={true}
               isLocked={false}
+              onEyeClick={()=> {}}
             />
           ) : null}
         </DragOverlay>
       </DndContext>
+
+      {/* Modal for displaying image */}
+      <ImageViewModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        image={modalImage}
+        title={modalTitle}
+      />
     </div>
   );
 }

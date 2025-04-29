@@ -5,18 +5,18 @@ type Photo = {
 };
 
 type PhotosByDateProps = {
-  date: string;
+  albumName: string;
   photos: Photo[];
 };
 
-function PhotosSection({ date, photos }: PhotosByDateProps) {
+function PhotosSection({ albumName, photos }: PhotosByDateProps) {
   return (
     <div className="my-8 px-4 mt-30">
       {/* Header Row */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-[#890000]">{date}</h2>
+        <h2 className="text-xl font-semibold text-[#890000]">{albumName}</h2>
         <button className="bg-[#890000] text-white px-4 py-2 rounded-xl hover:bg-[#6f0000] transition-colors cursor-pointer">
-          Explore More &gt;
+          View album &gt;
         </button>
       </div>
 

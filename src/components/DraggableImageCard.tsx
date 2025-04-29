@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { Eye, TrashIcon } from "lucide-react";
 
 // Sortable image card component
-function DraggableImageCard({ id, image, title, isDragging = false, isLocked = false }: {id: string, image: string, title: string, isDragging?: boolean, isLocked?: boolean}) {
+function DraggableImageCard({ id, image, title, isDragging = false, isLocked = false, onEyeClick }: {id: string, image: string, title: string, isDragging?: boolean, isLocked?: boolean, onEyeClick: () => void}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging: activeDragging } = useSortable({ id });
 
   const style = {
@@ -15,36 +15,37 @@ function DraggableImageCard({ id, image, title, isDragging = false, isLocked = f
 
   return (
     <div
-        ref={setNodeRef}
-        style={style}
-        {...(isLocked ? {} : { ...attributes, ...listeners })}
-        className={`relative aspect-square rounded-xl overflow-hidden shadow-md cursor-${isLocked ? 'default' : 'grab'} bg-white hover:shadow-lg transition-all ${
-            activeDragging ? 'ring-2 ring-[#890000]' : ''
-        }`}
+      ref={setNodeRef}
+      style={style}
+      {...(isLocked ? {} : { ...attributes, ...listeners })}
+      className={`relative aspect-square rounded-xl overflow-hidden shadow-md cursor-${isLocked ? 'default' : 'grab'} bg-white hover:shadow-lg transition-all ${
+        activeDragging ? 'ring-2 ring-[#890000]' : ''
+      }`}
     >
       <img
         src={image}
         alt={title}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
       />
       {
         isLocked && (
-            <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 flex flex-col items-center justify-center text-white text-center p-2 transition-opacity">
-                <p className="font-semibold text-sm">{title}</p>
-                <div className="flex gap-2">
-                    <button
-                        className="cursor-pointer bg-blue-400 p-2 mt-2 rounded hover:bg-blue-500"
-                    >
-                        <Eye />
-                    </button>
-                    <button
-                        className="cursor-pointer bg-red-400 p-2 mt-2 rounded hover:bg-red-500"
-                        onClick={() => window.alert("Deleting")}
-                    >
-                        <TrashIcon />
-                    </button>
-                </div>
+          <div className="absolute inset-0 bg-black bg-opacity-50 opacity-0 hover:opacity-100 flex flex-col items-center justify-center text-white text-center p-2 transition-opacity">
+            <p className="font-semibold text-sm">{title}</p>
+            <div className="flex gap-2">
+              <button
+                className="cursor-pointer bg-blue-400 p-2 mt-2 rounded hover:bg-blue-500"
+                onClick={onEyeClick} // Call the onEyeClick function
+              >
+                <Eye />
+              </button>
+              <button
+                className="cursor-pointer bg-red-400 p-2 mt-2 rounded hover:bg-red-500"
+                onClick={() => window.alert("Deleting")}
+              >
+                <TrashIcon />
+              </button>
             </div>
+          </div>
         )
       }
     </div>

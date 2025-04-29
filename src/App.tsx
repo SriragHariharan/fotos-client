@@ -5,13 +5,13 @@ import ImageBoard from "./pages/ImageBoard"
 
 const imageData = [
   {
-    imageURL: "https://placehold.co/150/0000FF/FFFFFF?text=Image+1",
+    imageURL: "https://www.kashmironline.com/blog/wp-content/uploads/2022/05/dal.jpg",
     title: "Mountain Sunrise",
     time: "2025-04-24T08:30:00Z"
   },
   {
-    imageURL: "https://placehold.co/1500/FF0000/FFFFFF?text=Image+2",
-    title: "Beach Vibes",
+    imageURL: "https://thumbs.dreamstime.com/z/beautiful-view-dal-lake-winter-srinagar-kashmir-india-srinagar-kashmir-india-january-view-dal-lake-winter-224410445.jpg",
+    title: "https://thumbs.dreamstime.com/z/beautiful-view-dal-lake-winter-srinagar-kashmir-india-srinagar-kashmir-india-january-view-dal-lake-winter-224410445.jpghttps://thumbs.dreamstime.com/z/beautiful-view-dal-lake-winter-srinagar-kashmir-india-srinagar-kashmir-india-january-view-dal-lake-winter-224410445.jpg",
     time: "2025-04-24T08:31:00Z"
   },
   {
