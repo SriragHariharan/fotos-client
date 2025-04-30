@@ -1,4 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form";
+import axiosInstance from "../axios/axios";
 
 type Inputs = {
   username: string;
@@ -15,7 +16,17 @@ function Signup() {
     formState: { errors },
   } = useForm<Inputs>();
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => console.log(data);
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    console.log(data);
+    axiosInstance
+      .post("/auth/signup", data)
+      .then((res) => {
+        console.log(res?.data);
+        const LOCALSTORAGE_NAME = import.meta.env.VITE_LOCALSTORAGE_NAME;
+        localStorage.setItem(LOCALSTORAGE_NAME, res.data.token);
+      })
+      .catch((err) => console.log(err));
+  }
   const password = watch("password");
 
   return (
