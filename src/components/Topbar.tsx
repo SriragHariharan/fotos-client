@@ -14,8 +14,8 @@ function Topbar() {
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-6 items-center">
           <Link to="/create" className="block text-[#890000] font-medium">Create</Link>
-          <Link to="/" className="text-[#890000] font-medium hover:underline">Profile</Link>
-          <Link to="/" className="text-[#890000] font-medium hover:underline">Albums</Link>
+          <Link to="/profile" className="text-[#890000] font-medium hover:underline">Profile</Link>
+          {/* <Link to="/" className="text-[#890000] font-medium hover:underline">Albums</Link> */}
           <button className="bg-[#890000] text-white px-4 py-1.5 rounded-xl hover:bg-[#6f0000] transition-colors">
             Logout
           </button>
@@ -33,8 +33,8 @@ function Topbar() {
       {menuOpen && (
         <div className="md:hidden bg-white border-t border-gray-100 px-4 pb-4 space-y-3">
           <Link to="/" className="block text-[#890000] font-medium">Create</Link>
-          <Link to="/" className="block text-[#890000] font-medium">Profile</Link>
-          <Link to="/" className="block text-[#890000] font-medium">Albums</Link>
+          <Link to="/profile" className="block text-[#890000] font-medium">Profile</Link>
+          {/* <Link to="/" className="block text-[#890000] font-medium">Albums</Link> */}
           <button className="w-full bg-[#890000] text-white py-2 rounded-xl hover:bg-[#6f0000] transition-colors">
             Logout
           </button>
