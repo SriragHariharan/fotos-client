@@ -21,7 +21,7 @@ function Homepage() {
         )
       }
       {
-        !loading && !error && albums?.map(album => <PhotosSection key={album.id} albumName={album.name} photos={album.images} />)
+        !loading && !error && albums?.map(album => <PhotosSection key={album._id} albumID={album?._id} albumName={album.name} photos={album.images} />)
       }
     </div>
   )

@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Homepage from "./pages/Homepage";
 import Upload from "./pages/Upload";
+import ImageBoard from "./pages/ImageBoard";
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/" element={ <ProtectedRoute /> }>
             <Route index element={ <Homepage /> } />
             <Route path="/create" element={ <Upload />} />
+            <Route path="/album/:albumID" element={ <ImageBoard />} />
           </Route>
 
           <Route path="*" element={<div className='text-center text-6xl'>404 Not Found</div>} />

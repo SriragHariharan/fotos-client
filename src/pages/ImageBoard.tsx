@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -14,15 +14,27 @@ import {
 } from '@dnd-kit/sortable';
 import DraggableImageCard from '../components/DraggableImageCard';
 import ImageViewModal from '../modals/ImageViewModal';
+import { useParams } from 'react-router';
+import useAlbumDetails from '../hooks/useAlbumDetails';
+import { format } from 'date-fns';
 
-function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
-  const initialIds = imagesMetadata.map((_, i) => i.toString());
-  const [items, setItems] = useState(initialIds);
+function ImageBoard() {
+  const { albumID } = useParams<{ albumID: string }>();
+
+  const { albumDetails, loading, error } = useAlbumDetails({ albumID });
+
+  const [items, setItems] = useState<string[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [isLocked, setIsLocked] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalImage, setModalImage] = useState('');
   const [modalTitle, setModalTitle] = useState('');
+
+  useEffect(() => {
+    if (albumDetails?.images) {
+      setItems(albumDetails.images.map((img) => img._id));
+    }
+  }, [albumDetails]);
 
   const sensors = useSensors(useSensor(PointerSensor));
 
@@ -34,7 +46,7 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
   const handleDragEnd = (event: any) => {
     if (isLocked) return;
     const { active, over } = event;
-    if (active.id !== over.id) {
+    if (active.id !== over?.id) {
       const oldIndex = items.indexOf(active.id);
       const newIndex = items.indexOf(over.id);
       setItems(arrayMove(items, oldIndex, newIndex));
@@ -47,8 +59,12 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
   };
 
   const handleSaveOrder = () => {
-    const reordered = items.map((id) => imagesMetadata[parseInt(id)]);
-    console.log("🧩 New Order:", reordered);
+    if (!albumDetails?.images) return;
+    const reordered = items.map((id) =>
+      albumDetails.images.find((img) => img._id === id)
+    );
+    console.log('🧩 New Order:', reordered);
+    // TODO: API call to save reordered images
   };
 
   const openModal = (image: string, title: string) => {
@@ -61,13 +77,36 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
     setIsModalOpen(false);
   };
 
+  const handleDeleteImage = (idToDelete: string) => {
+    setItems((prev) => prev.filter((id) => id !== idToDelete));
+    // TODO: Optional API call to delete image
+  };
+
+  if (loading) {
+    return <div className="w-full p-4">Loading album details...</div>;
+  }
+
+  if (error) {
+    return <div className="w-full p-4">Error: {error}</div>;
+  }
+
+  if (!albumDetails) {
+    return <div className="w-full p-4">Album not found</div>;
+  }
+
+  const formattedDate = albumDetails.updatedAt
+    ? format(new Date(albumDetails.updatedAt), 'MMMM d, yyyy')
+    : 'unknown date';
+
   return (
-    <div className="w-full p-4">
-      {/* Buttons */}
+    <div className="max-w-6xl mx-auto p-4">
+      {/* Header */}
       <div className="flex justify-between my-12">
         <div>
-          <h1 className="text-3xl font-semibold mb-4">⛄Kashmir ❄️ Diaries 📖</h1>
-          <div className="text-xs font-semibold text-gray-400">25 photos ▪️ last edited: 3 days ago ▪️ Private </div>
+          <h1 className="text-3xl font-semibold mb-4">{albumDetails.name}</h1>
+          <div className="text-xs font-semibold text-gray-400">
+            {albumDetails.images.length} photos ▪️ last edited: {formattedDate} ▪️ Private
+          </div>
         </div>
         <div className="flex justify-end mb-4 gap-2">
           <button
@@ -89,8 +128,8 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
         </div>
       </div>
 
-      {/* DND context */}
-      < DndContext
+      {/* DnD area */}
+      <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
@@ -100,37 +139,44 @@ function ImageBoard({ imagesMetadata }: { imagesMetadata: any[] }) {
         <SortableContext items={items} strategy={verticalListSortingStrategy}>
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {items.map((id) => {
-              const { imageURL, title } = imagesMetadata[parseInt(id)];
+              const imageData = albumDetails.images.find((img) => img._id === id);
+              if (!imageData) return null;
+
               return (
                 <DraggableImageCard
                   key={id}
                   id={id}
-                  image={imageURL}
-                  title={title}
+                  image={imageData.url}
+                  title={imageData.title}
                   isLocked={isLocked}
-                  onEyeClick={() => openModal(imageURL, title)} // Pass the click handler
+                  onEyeClick={() => openModal(imageData.url, imageData.title)}
+                  onDelete={() => handleDeleteImage(id)}
                 />
               );
             })}
           </div>
         </SortableContext>
 
-        {/* Drag overlay */}
         <DragOverlay>
-          {activeId && !isLocked ? (
-            <DraggableImageCard
-              id={activeId}
-              image={imagesMetadata[parseInt(activeId)].imageURL}
-              title={imagesMetadata[parseInt(activeId)].title}
-              isDragging={true}
-              isLocked={false}
-              onEyeClick={()=> {}}
-            />
-          ) : null}
+          {activeId && !isLocked &&
+            (() => {
+              const activeImage = albumDetails.images.find((img) => img._id === activeId);
+              return activeImage ? (
+                <DraggableImageCard
+                  id={activeId}
+                  image={activeImage.url}
+                  title={activeImage.title}
+                  isDragging={true}
+                  isLocked={false}
+                  onEyeClick={() => {}}
+                  onDelete={() => {}}
+                />
+              ) : null;
+            })()}
         </DragOverlay>
       </DndContext>
 
-      {/* Modal for displaying image */}
+      {/* Modal */}
       <ImageViewModal
         isOpen={isModalOpen}
         onClose={closeModal}
