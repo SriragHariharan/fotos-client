@@ -17,6 +17,7 @@ import ImageViewModal from '../modals/ImageViewModal';
 import { useParams } from 'react-router';
 import useAlbumDetails from '../hooks/useAlbumDetails';
 import { format } from 'date-fns';
+import axiosInstance from '../axios/axios';
 
 function ImageBoard() {
   const { albumID } = useParams<{ albumID: string }>();
@@ -64,7 +65,13 @@ function ImageBoard() {
       albumDetails.images.find((img) => img._id === id)
     );
     console.log('🧩 New Order:', reordered);
-    // TODO: API call to save reordered images
+    axiosInstance.put(`/album/${albumID}`, { images: reordered })
+    .then((resp) => {
+      console.log(resp);
+    })
+    .catch((err) => {
+      console.log(err?.response?.data?.message);
+    })
   };
 
   const openModal = (image: string, title: string) => {
