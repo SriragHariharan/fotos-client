@@ -1,9 +1,14 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 
 function Topbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem(import.meta.env.VITE_LOCALSTORAGE_NAME);
+    navigate("/login");
+  }
 
   return (
     <header className="bg-white shadow-md border-b border-gray-200">
@@ -16,7 +21,7 @@ function Topbar() {
           <Link to="/create" className="block text-[#890000] font-medium">Create</Link>
           <Link to="/profile" className="text-[#890000] font-medium hover:underline">Profile</Link>
           {/* <Link to="/" className="text-[#890000] font-medium hover:underline">Albums</Link> */}
-          <button className="bg-[#890000] text-white px-4 py-1.5 rounded-xl hover:bg-[#6f0000] transition-colors">
+          <button onClick={handleLogout} className="bg-[#890000] text-white px-4 py-1.5 rounded-xl hover:bg-[#6f0000] transition-colors">
             Logout
           </button>
         </nav>
@@ -35,7 +40,7 @@ function Topbar() {
           <Link to="/" className="block text-[#890000] font-medium">Create</Link>
           <Link to="/profile" className="block text-[#890000] font-medium">Profile</Link>
           {/* <Link to="/" className="block text-[#890000] font-medium">Albums</Link> */}
-          <button className="w-full bg-[#890000] text-white py-2 rounded-xl hover:bg-[#6f0000] transition-colors">
+          <button onClick={handleLogout} className="w-full bg-[#890000] text-white py-2 rounded-xl hover:bg-[#6f0000] transition-colors cursor-pointer">
             Logout
           </button>
         </div>

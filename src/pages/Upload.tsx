@@ -1,12 +1,16 @@
 import { useState } from "react";
 import UploadCard from "../components/UploadCard";
 import axiosInstance from "../axios/axios";
+import { useNavigate } from "react-router";
 
 function Upload() {
   const [imagesMetadata, setImagesMetadata] = useState<{ image: File; title: string; imageURL: string; album: string }[]>([]);
   const [images, setImages] = useState<File[]>([]); // Change to an array
   const [title, setTitle] = useState("");
   const [album, setAlbum] = useState("Kashmir diaries");
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const navigate = useNavigate();
 
   const handleAddToUploadList = () => {
     if (images.length === 0 || !title.trim()) return; // Check for album name
@@ -23,6 +27,7 @@ function Upload() {
 
   // Upload to server
   const handleUpload = async () => {
+    setLoading(true);
     try {
       console.log(imagesMetadata)
       if (imagesMetadata.length === 0) return;
@@ -39,8 +44,8 @@ function Upload() {
           'Content-Type': "multipart/form-data"
         }
       })
-        .then((response) => {
-          console.log("from server::: ",response.data);
+        .then(() => {
+          navigate("/");
         })
         .catch((error) => {
           console.error(error);
@@ -48,6 +53,9 @@ function Upload() {
     } 
     catch (error) {
       console.error(error);
+    }
+    finally {
+      setLoading(false);
     }
   }
 
@@ -121,7 +129,7 @@ function Upload() {
 
       {/* Upload and Cancel buttons */}
       <div className="flex justify-between w-full max-w-md mt-8 gap-4">
-        {imagesMetadata.length > 0 && (
+        { !loading && imagesMetadata.length > 0 && (
           <button
             onClick={handleUpload}
             className="w-full bg-[#890000] text-white py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer"

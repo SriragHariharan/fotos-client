@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { User2, Eye, EyeOff } from "lucide-react";
+import useProfile from "../hooks/useProfile";
+import axiosInstance from "../axios/axios";
 
 interface PasswordFormInputs {
   currentPassword: string;
@@ -9,6 +11,9 @@ interface PasswordFormInputs {
 }
 
 export default function ProfilePage() {
+
+  const { profile } = useProfile();
+
   const {
     register,
     handleSubmit,
@@ -34,8 +39,19 @@ export default function ProfilePage() {
       return;
     }
 
-    console.log("🔒 Password update request", data);
-    setFormMessage("✅ Password updated successfully!");
+    axiosInstance
+      .put("/auth/password", data)
+      .then(() => {
+        setFormMessage("✅ Password updated successfully!, Login with new password");
+        // Redirect to login page
+        setTimeout(() => {
+          localStorage.removeItem(import.meta.env.VITE_LOCALSTORAGE_NAME);
+          window.location.href = "/login";
+        }, 5000)
+      })
+      .catch((error) => {
+        setFormMessage(error?.response?.data?.message);
+      })
     reset();
   };
 
@@ -47,8 +63,8 @@ export default function ProfilePage() {
           <User2 className="w-10 h-10 text-gray-500" />
         </div>
         <div className="ml-6">
-          <h2 className="text-xl font-semibold text-gray-800">John Doe</h2>
-          <p className="text-sm text-gray-500">john.doe@example.com</p>
+          <h2 className="text-xl font-semibold text-gray-800">{profile?.username}</h2>
+          <p className="text-sm text-gray-500">{profile?.email}</p>
         </div>
       </div>
 

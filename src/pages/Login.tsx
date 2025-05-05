@@ -1,5 +1,6 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import axiosInstance from "../axios/axios";
+import { useNavigate } from "react-router";
 
 type Inputs = {
   username: string;
@@ -15,6 +16,8 @@ function Login() {
     formState: { errors },
   } = useForm<Inputs>();
 
+  const navigate = useNavigate();
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     console.log(data);
     axiosInstance
@@ -23,6 +26,7 @@ function Login() {
         console.log(res?.data)
         const LOCALSTORAGE_NAME = import.meta.env.VITE_LOCALSTORAGE_NAME;
         localStorage.setItem(LOCALSTORAGE_NAME, res.data.token);
+        navigate("/");
       })
       .catch((err) => console.log(err));
   }
