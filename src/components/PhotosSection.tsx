@@ -1,7 +1,7 @@
 type Photo = {
   id: string;
-  src: string;
-  caption: string;
+  url: string;
+  title: string;
 };
 
 type PhotosByDateProps = {
@@ -14,7 +14,7 @@ function PhotosSection({ albumName, photos }: PhotosByDateProps) {
     <div className="my-8 px-4 mt-30">
       {/* Header Row */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-[#890000]">{albumName}</h2>
+        <h2 className="text-2xl font-semibold text-[#890000]">{albumName}</h2>
         <button className="bg-[#890000] text-white px-4 py-2 rounded-xl hover:bg-[#6f0000] transition-colors cursor-pointer">
           View album &gt;
         </button>
@@ -25,8 +25,8 @@ function PhotosSection({ albumName, photos }: PhotosByDateProps) {
         {photos.map((photo) => (
           <div key={photo.id} className="relative overflow-hidden group rounded-xl shadow-md">
             <img
-              src={photo.src}
-              alt={photo.caption}
+              src={photo.url}
+              alt={photo.title}
               loading="lazy"
               className="h-full w-full object-cover rounded-xl"
             />
