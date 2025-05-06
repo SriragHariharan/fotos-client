@@ -1,5 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import axiosInstance from "../axios/axios";
+import { useState } from "react"; // Import useState
+import { Link } from "react-router";
 
 type Inputs = {
   username: string;
@@ -16,8 +18,14 @@ function Signup() {
     formState: { errors },
   } = useForm<Inputs>();
 
+  const [loading, setLoading] = useState(false); // Loading state
+  const [serverError, setServerError] = useState<string | null>(null); // Server error state
+  const password = watch("password");
+
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+    setLoading(true); // Set loading to true
+    setServerError(null); // Reset server error
+
     axiosInstance
       .post("/auth/signup", data)
       .then((res) => {
@@ -25,9 +33,19 @@ function Signup() {
         const LOCALSTORAGE_NAME = import.meta.env.VITE_LOCALSTORAGE_NAME;
         localStorage.setItem(LOCALSTORAGE_NAME, res.data.token);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        // Set server error message if available
+        if (err.response && err.response.data && err.response.data.message) {
+          setServerError(err.response.data.message);
+        } else {
+          setServerError("An unexpected error occurred. Please try again.");
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Set loading to false
+      });
   }
-  const password = watch("password");
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white px-4">
@@ -84,7 +102,7 @@ function Signup() {
               className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#890000]"
             />
             {errors.password?.type === "required" && (
-              <p className="text-red-500 text-xs mt-1">Password is required</p>
+              <p className=" text-red-500 text-xs mt-1">Password is required</p>
             )}
             {errors.password?.type === "minLength" && (
               <p className="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
@@ -111,14 +129,23 @@ function Signup() {
             )}
           </div>
 
-          {/* Submit */}
+          {/* Server Error Message */}
+          {serverError && (
+            <p className="text-red-700 mt-1 text-center font-semibold bg-red-100 p-2 rounded-full">{serverError}</p>
+          )}
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#890000] text-white py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer"
+            className={`w-full bg-[#890000] text-white py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading} // Disable button while loading
           >
-            Sign Up
+            {loading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">Already have an account? <Link to="/login" className="text-[#890000] font-semibold">Login</Link></p>
+        </div>
       </div>
     </div>
   );

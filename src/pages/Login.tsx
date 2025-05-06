@@ -1,6 +1,7 @@
 import { useForm, SubmitHandler } from "react-hook-form";
 import axiosInstance from "../axios/axios";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
+import { useState } from "react"; // Import useState
 
 type Inputs = {
   username: string;
@@ -17,18 +18,32 @@ function Login() {
   } = useForm<Inputs>();
 
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false); // Loading state
+  const [serverError, setServerError] = useState<string | null>(null); // Server error state
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data);
+    setLoading(true); // Set loading to true
+    setServerError(null); // Reset server error
+
     axiosInstance
       .post("/auth/login", data)
       .then(res => {
-        console.log(res?.data)
+        console.log(res?.data);
         const LOCALSTORAGE_NAME = import.meta.env.VITE_LOCALSTORAGE_NAME;
         localStorage.setItem(LOCALSTORAGE_NAME, res.data.token);
         navigate("/");
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        console.log(err);
+        if (err.response && err.response.data && err.response.data.message) {
+          setServerError(err.response.data.message);
+        } else {
+          setServerError("An unexpected error occurred. Please try again.");
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
   return (
@@ -74,14 +89,23 @@ function Login() {
             )}
           </div>
 
-          {/* Submit */}
+          {/* Server Error Message */}
+          {serverError && (
+            <p className="text-red-700 mt-1 text-center font-semibold bg-red-100 p-2 rounded-full">{serverError}</p>
+          )}
+
+          {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-[#890000] text-white py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer"
+            className={`w-full bg-[#890000] text-white py-2 rounded-xl font-semibold hover:bg-[#6f0000] transition-colors cursor-pointer ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={loading} // Disable button while loading
           >
-            Login now
+            {loading ? 'Logging in...' : 'Login now'}
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-gray-600">Don't have an account? <Link to="/signup" className="text-[#890000] font-semibold">Sign up</Link></p>
+        </div>
       </div>
     </div>
   );
